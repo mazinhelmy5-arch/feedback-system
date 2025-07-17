@@ -84,6 +84,8 @@
 
         .content {
             padding: 30px;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         .welcome-message {
@@ -112,7 +114,15 @@
             font-weight: normal;
         }
 
-        input[type="text"] {
+        .required-text {
+            font-size: 12px;
+            color: #ff6b6b;
+            font-weight: normal;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -122,10 +132,39 @@
             transition: border-color 0.3s ease;
         }
 
-        input[type="text"]:focus {
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .contact-section {
+            background: linear-gradient(135deg, #f8f9ff, #e3f2fd);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .contact-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .contact-subtitle {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         .rating-group {
@@ -193,6 +232,12 @@
             transform: translateY(0);
         }
 
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .rating-text {
             font-size: 12px;
             color: #666;
@@ -231,6 +276,37 @@
             color: #ff6b6b;
         }
 
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon input {
+            padding-right: 40px;
+        }
+
+        .input-icon::before {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .phone-icon::before {
+            content: '📱';
+            font-size: 16px;
+        }
+
+        .email-icon::before {
+            content: '✉';
+            font-size: 16px;
+        }
+
         @media (max-width: 480px) {
             .container {
                 margin: 10px;
@@ -238,6 +314,7 @@
             
             .content {
                 padding: 20px;
+                max-height: 85vh;
             }
             
             .brand-name {
@@ -265,12 +342,35 @@
 
             <form id="customerFeedback">
                 <div class="form-group">
-                    <label>الاسم <span class="optional-text">(اختياري)</span>:</label>
-                    <input type="text" id="customerName" placeholder="اكتب اسمك هنا إذا كنت ترغب في ذلك...">
+                    <label>الاسم:</label>
+                    <input type="text" id="customerName" placeholder="اكتب اسمك هنا..." required>
+                </div>
+
+                <div class="contact-section">
+                    <div class="contact-title">
+                        📞 طرق التواصل معك
+                    </div>
+                    <div class="contact-subtitle">
+                        (لنتمكن من التواصل معك في حالة وجود أي استفسارات أو عروض خاصة)
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>رقم التليفون:</label>
+                        <div class="input-icon phone-icon">
+                            <input type="tel" id="customerPhone" placeholder="أدخل رقم التليفون..." required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>البريد الإلكتروني <span class="optional-text">(اختياري)</span>:</label>
+                        <div class="input-icon email-icon">
+                            <input type="email" id="customerEmail" placeholder="أدخل البريد الإلكتروني...">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>تقييم جودة المنتج:</label>
+                    <label>تقييم جودة المنتج <span class="required-text">(مطلوب)</span>:</label>
                     <div class="rating-group" data-rating="product">
                         <span class="star" data-value="1">★</span>
                         <span class="star" data-value="2">★</span>
@@ -281,7 +381,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>تقييم التغليف:</label>
+                    <label>تقييم التغليف <span class="required-text">(مطلوب)</span>:</label>
                     <div class="rating-group" data-rating="packaging">
                         <span class="star" data-value="1">★</span>
                         <span class="star" data-value="2">★</span>
@@ -292,7 +392,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>تقييم التوصيل:</label>
+                    <label>تقييم التوصيل <span class="required-text">(مطلوب)</span>:</label>
                     <div class="rating-group" data-rating="delivery">
                         <span class="star" data-value="1">★</span>
                         <span class="star" data-value="2">★</span>
@@ -322,7 +422,6 @@
         </div>
     </div>
 
-    <!-- Formspree Integration -->
     <script>
         // تخزين التقييمات
         let ratings = {
@@ -376,20 +475,48 @@
             });
         });
 
+        // التحقق من صحة البريد الإلكتروني
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // التحقق من صحة رقم التليفون
+        function validatePhone(phone) {
+            const re = /^[\d\s\+\-\(\)]+$/;
+            return re.test(phone) && phone.replace(/\D/g, '').length >= 10;
+        }
+
         // معالجة إرسال النموذج
         document.getElementById('customerFeedback').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // تحقق من وجود تقييمات
+            // تحقق من وجود التقييمات المطلوبة
             if (ratings.product === 0 || ratings.packaging === 0 || ratings.delivery === 0) {
-                alert('يرجى تقييم جميع الجوانب قبل الإرسال');
+                alert('يرجى تقييم جميع الجوانب المطلوبة قبل الإرسال');
                 return;
             }
             
             // جمع البيانات
             const customerName = document.getElementById('customerName').value.trim();
+            const customerPhone = document.getElementById('customerPhone').value.trim();
+            const customerEmail = document.getElementById('customerEmail').value.trim();
+            
+            // التحقق من صحة البيانات
+            if (customerEmail && !validateEmail(customerEmail)) {
+                alert('يرجى إدخال بريد إلكتروني صحيح');
+                return;
+            }
+            
+            if (customerPhone && !validatePhone(customerPhone)) {
+                alert('يرجى إدخال رقم تليفون صحيح');
+                return;
+            }
+            
             const feedback = {
                 customerName: customerName || 'غير محدد',
+                customerPhone: customerPhone || 'غير محدد',
+                customerEmail: customerEmail || 'غير محدد',
                 productRating: ratings.product,
                 packagingRating: ratings.packaging,
                 deliveryRating: ratings.delivery,
@@ -411,24 +538,29 @@
                 message: `
 🧶 تقييم جديد من Exner's Crochet 🧶
 
-👤 اسم العميل: ${feedback.customerName}
-📅 التاريخ: ${feedback.date}
-🕐 الوقت: ${feedback.time}
+👤 بيانات العميل:
+• الاسم: ${feedback.customerName}
+• التليفون: ${feedback.customerPhone}
+• البريد الإلكتروني: ${feedback.customerEmail}
+• تاريخ التقييم: ${feedback.date}
+• وقت التقييم: ${feedback.time}
 
 ⭐ التقييمات:
 • جودة المنتج: ${feedback.productRating} من 5 نجوم (${getStars(feedback.productRating)})
 • التغليف: ${feedback.packagingRating} من 5 نجوم (${getStars(feedback.packagingRating)})  
 • التوصيل: ${feedback.deliveryRating} من 5 نجوم (${getStars(feedback.deliveryRating)})
 
+📊 إجمالي التقييم: ${((feedback.productRating + feedback.packagingRating + feedback.deliveryRating) / 3).toFixed(1)} من 5
+
 💬 التعليقات الإضافية:
 ${feedback.comments || 'لا توجد تعليقات إضافية'}
-
-📊 إجمالي التقييم: ${((feedback.productRating + feedback.packagingRating + feedback.deliveryRating) / 3).toFixed(1)} من 5
 
 ---
 تم الإرسال من نظام التقييم - Exner's Crochet
                 `,
                 customer_name: feedback.customerName,
+                customer_phone: feedback.customerPhone,
+                customer_email: feedback.customerEmail,
                 product_rating: feedback.productRating,
                 packaging_rating: feedback.packagingRating,
                 delivery_rating: feedback.deliveryRating,
@@ -469,6 +601,17 @@ ${feedback.comments || 'لا توجد تعليقات إضافية'}
         function getStars(rating) {
             return '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
         }
+
+        // تحسين تجربة المستخدم - إضافة تأثيرات بصرية للتركيز
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
     </script>
 </body>
 </html>

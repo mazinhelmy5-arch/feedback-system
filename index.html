@@ -106,6 +106,28 @@
             font-size: 14px;
         }
 
+        .optional-text {
+            font-size: 12px;
+            color: #999;
+            font-weight: normal;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
         .rating-group {
             display: flex;
             gap: 5px;
@@ -243,6 +265,11 @@
 
             <form id="customerFeedback">
                 <div class="form-group">
+                    <label>الاسم <span class="optional-text">(اختياري)</span>:</label>
+                    <input type="text" id="customerName" placeholder="اكتب اسمك هنا إذا كنت ترغب في ذلك...">
+                </div>
+
+                <div class="form-group">
                     <label>تقييم جودة المنتج:</label>
                     <div class="rating-group" data-rating="product">
                         <span class="star" data-value="1">★</span>
@@ -360,7 +387,9 @@
             }
             
             // جمع البيانات
+            const customerName = document.getElementById('customerName').value.trim();
             const feedback = {
+                customerName: customerName || 'غير محدد',
                 productRating: ratings.product,
                 packagingRating: ratings.packaging,
                 deliveryRating: ratings.delivery,
@@ -382,6 +411,7 @@
                 message: `
 🧶 تقييم جديد من Exner's Crochet 🧶
 
+👤 اسم العميل: ${feedback.customerName}
 📅 التاريخ: ${feedback.date}
 🕐 الوقت: ${feedback.time}
 
@@ -398,6 +428,7 @@ ${feedback.comments || 'لا توجد تعليقات إضافية'}
 ---
 تم الإرسال من نظام التقييم - Exner's Crochet
                 `,
+                customer_name: feedback.customerName,
                 product_rating: feedback.productRating,
                 packaging_rating: feedback.packagingRating,
                 delivery_rating: feedback.deliveryRating,
@@ -408,7 +439,7 @@ ${feedback.comments || 'لا توجد تعليقات إضافية'}
             
             try {
                 // إرسال البيانات
-               const response = await fetch('https://formspree.io/f/mblkjnqd', {
+                const response = await fetch('https://formspree.io/f/mblkjnqd', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
